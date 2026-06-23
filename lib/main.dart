@@ -38,6 +38,9 @@ class _ChatPageState extends State<ChatPage> {
   List<Map<String, dynamic>> messages = [];
   bool loading = false;
 
+  // =========================
+  // ONLY SCROLL WHEN NEW QUESTION IS SENT
+  // =========================
   void scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) {
@@ -68,6 +71,7 @@ class _ChatPageState extends State<ChatPage> {
       loading = true;
     });
 
+    // ✅ scroll ONLY when new question is sent
     scrollToBottom();
 
     try {
@@ -79,7 +83,7 @@ class _ChatPageState extends State<ChatPage> {
       }).toList();
 
       final response = await http.post(
-        Uri.parse("https://safebot-backend.onrender.com/ask"), // CHANGE THIS IP
+        Uri.parse("https://safebot-backend.onrender.com/ask"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "question": question,
@@ -100,6 +104,8 @@ class _ChatPageState extends State<ChatPage> {
       });
 
       controller.clear();
+
+      // ❌ DO NOT auto-scroll during AI response updates
       scrollToBottom();
     } catch (e) {
       setState(() {
@@ -120,7 +126,7 @@ class _ChatPageState extends State<ChatPage> {
     final page = pages.isNotEmpty ? pages.first : 1;
 
     final url = Uri.parse(
-      "https://safebot-backend.onrender.com/manual#page=$page", // CHANGE THIS IP
+      "https://safebot-backend.onrender.com/manual#page=$page",
     );
 
     if (await canLaunchUrl(url)) {
@@ -215,7 +221,7 @@ class _ChatPageState extends State<ChatPage> {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                Image.asset('assets/logo.png', height: 120),
+                Image.asset('assets/logo.png', height: 100),
                 const SizedBox(height: 10),
                 const Text(
                   "Safety Assistant",
