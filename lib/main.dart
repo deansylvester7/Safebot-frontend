@@ -79,7 +79,7 @@ class _ChatPageState extends State<ChatPage> {
       }).toList();
 
       final response = await http.post(
-        Uri.parse("http://192.168.0.117:5000/ask"), // CHANGE THIS IP
+        Uri.parse("https://safebot-backend.onrender.com/ask"), // CHANGE THIS IP
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "question": question,
@@ -120,7 +120,7 @@ class _ChatPageState extends State<ChatPage> {
     final page = pages.isNotEmpty ? pages.first : 1;
 
     final url = Uri.parse(
-      "http://192.168.0.117:5000/manual#page=$page", // CHANGE THIS IP
+      "https://safebot-backend.onrender.com/manual#page=$page", // CHANGE THIS IP
     );
 
     if (await canLaunchUrl(url)) {
