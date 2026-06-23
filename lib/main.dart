@@ -205,7 +205,7 @@ class _ChatPageState extends State<ChatPage> {
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         centerTitle: true,
-        title: const Text("T&T Safety Assistant"),
+        title: const Text("T&T Safety Assistant poop"),
       ),
       body: Column(
         children: [

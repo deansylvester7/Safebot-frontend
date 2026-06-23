@@ -1,46 +1,79 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.build/
-.buildlog/
-.history
-.svn/
-.swiftpm/
-migrate_working_dir/
+# =========================
+# FLUTTER / DART
+# =========================
 
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
+# Build output
+build/
+**/build/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
+# Dart tool cache
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
-.pub-cache/
+.packages
 .pub/
-/build/
-/coverage/
+.pub-cache/
+
+# Coverage reports
+coverage/
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# =========================
+# ENV / SECRETS (IMPORTANT)
+# =========================
+
 .env
+*.env
 
-# Symbolication related
-app.*.symbols
+# =========================
+# IDEs
+# =========================
 
-# Obfuscation related
-app.*.map.json
+.idea/
+*.iml
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+.vscode/
+*.code-workspace
+
+# =========================
+# OS FILES
+# =========================
+
+.DS_Store
+Thumbs.db
+
+# =========================
+# ANDROID / IOS / WEB BUILD ARTIFACTS
+# =========================
+
+# Android
+/android/app/debug/
+/android/app/profile/
+/android/app/release/
+
+# iOS
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Pods/
+
+# Web (optional safety net)
+web/main.dart.js.map
+
+# =========================
+# LOGS / TEMP
+# =========================
+
+*.log
+*.tmp
+*.swp
+
+# =========================
+# VERSION CONTROL EDGE CASES
+# =========================
+
+.history/
+.svn/
