@@ -38,10 +38,12 @@ class _ChatPageState extends State<ChatPage> {
   List<Map<String, dynamic>> messages = [];
   bool loading = false;
 
-  // =========================
-  // ONLY SCROLL WHEN NEW QUESTION IS SENT
-  // =========================
-  void scrollToBottom() {
+  // 🔥 controls scrolling behavior
+  bool _shouldScroll = false;
+
+  void _scrollIfNeeded() {
+    if (!_shouldScroll) return;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) {
         scrollController.animateTo(
@@ -51,6 +53,8 @@ class _ChatPageState extends State<ChatPage> {
         );
       }
     });
+
+    _shouldScroll = false;
   }
 
   Future<void> askPresetQuestion(String question) async {
@@ -68,11 +72,17 @@ class _ChatPageState extends State<ChatPage> {
         "text": question,
         "sources": [],
       });
+
       loading = true;
+
+      // ✅ only trigger scroll ONCE per new user message
+      _shouldScroll = true;
     });
 
-    // ✅ scroll ONLY when new question is sent
-    scrollToBottom();
+    controller.clear();
+
+    // scroll after user message only
+    _scrollIfNeeded();
 
     try {
       final history = messages.map((m) {
@@ -103,10 +113,7 @@ class _ChatPageState extends State<ChatPage> {
         loading = false;
       });
 
-      controller.clear();
-
-      // ❌ DO NOT auto-scroll during AI response updates
-      scrollToBottom();
+      // ❌ IMPORTANT: no scroll here anymore
     } catch (e) {
       setState(() {
         messages.add({
@@ -117,8 +124,6 @@ class _ChatPageState extends State<ChatPage> {
 
         loading = false;
       });
-
-      scrollToBottom();
     }
   }
 
@@ -171,7 +176,6 @@ class _ChatPageState extends State<ChatPage> {
               message["text"] ?? "",
               style: const TextStyle(fontSize: 16),
             ),
-
             if (sources.isNotEmpty) ...[
               const SizedBox(height: 16),
               const Divider(),
@@ -180,7 +184,6 @@ class _ChatPageState extends State<ChatPage> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-
               ...sources.map((source) {
                 final title = source["title"] ?? "Unknown";
                 final pages = source["pages"] ?? [];
@@ -241,7 +244,6 @@ class _ChatPageState extends State<ChatPage> {
               ],
             ),
           ),
-
           Container(
             color: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -259,7 +261,6 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ),
           ),
-
           Expanded(
             child: ListView.builder(
               controller: scrollController,
@@ -270,7 +271,6 @@ class _ChatPageState extends State<ChatPage> {
               },
             ),
           ),
-
           if (loading)
             const Padding(
               padding: EdgeInsets.all(12),
@@ -282,7 +282,6 @@ class _ChatPageState extends State<ChatPage> {
                 ],
               ),
             ),
-
           Container(
             padding: const EdgeInsets.all(12),
             color: Colors.white,
@@ -306,7 +305,6 @@ class _ChatPageState extends State<ChatPage> {
               ],
             ),
           ),
-
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(10),
