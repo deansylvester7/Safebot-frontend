@@ -168,6 +168,7 @@ class _ChatPageState extends State<ChatPage> {
       );
 
       final data = jsonDecode(response.body);
+      print(data["sources"]);
 
       setState(() {
         messages.add({
