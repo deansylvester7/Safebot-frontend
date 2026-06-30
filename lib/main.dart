@@ -214,62 +214,119 @@ class _ChatPageState extends State<ChatPage> {
 Widget buildMessage(Map<String, dynamic> msg) {
   final isUser = msg["role"] == "user";
 
+  final sources = msg["sources"];
+
   return AnimatedOpacity(
     duration: const Duration(milliseconds: 250),
     opacity: 1.0,
-    child: AnimatedSlide(
-      duration: const Duration(milliseconds: 250),
-      offset: const Offset(0, 0),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          mainAxisAlignment:
-              isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment:
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
 
-            if (!isUser)
-              const CircleAvatar(
-                radius: 14,
-                backgroundColor: Colors.green,
-                child: Icon(Icons.security, size: 14, color: Colors.white),
-              ),
-
-            if (!isUser) const SizedBox(width: 8),
-
-            Flexible(
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isUser ? Colors.green.shade600 : Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
-                child: Text(
-                  msg["text"] ?? "",
-                  style: TextStyle(
-                    color: isUser ? Colors.white : Colors.black87,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
+          if (!isUser)
+            const CircleAvatar(
+              radius: 14,
+              backgroundColor: Colors.green,
+              child: Icon(Icons.security, size: 14, color: Colors.white),
             ),
 
-            if (isUser) const SizedBox(width: 8),
+          if (!isUser) const SizedBox(width: 8),
 
-            if (isUser)
-              const CircleAvatar(
-                radius: 14,
-                backgroundColor: Colors.grey,
-                child: Icon(Icons.person, size: 14, color: Colors.white),
-              ),
-          ],
-        ),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                // ================= MESSAGE BUBBLE =================
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isUser
+                        ? Colors.green.shade600
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    msg["text"] ?? "",
+                    style: TextStyle(
+                      color: isUser ? Colors.white : Colors.black87,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+
+                // ================= SOURCE CARDS =================
+                if (!isUser &&
+                    sources != null &&
+                    sources is List &&
+                    sources.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Column(
+                      children: sources.map<Widget>((s) {
+                        final pages = (s["pages"] ?? [1]) as List;
+
+                        return GestureDetector(
+                          onTap: () => openSource(
+                            s["title"] ?? "Source",
+                            pages,
+                          ),
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 6),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.green.shade50,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Colors.green.shade200,
+                              ),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.description,
+                                    size: 16, color: Colors.green),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    "View Source",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                Icon(Icons.open_in_new,
+                                    size: 14, color: Colors.green),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
+          if (isUser) const SizedBox(width: 8),
+
+          if (isUser)
+            const CircleAvatar(
+              radius: 14,
+              backgroundColor: Colors.grey,
+              child: Icon(Icons.person, size: 14, color: Colors.white),
+            ),
+        ],
       ),
     ),
   );
@@ -310,6 +367,21 @@ Widget buildMessage(Map<String, dynamic> msg) {
 
           child: Column(
             children: [
+              // ================= CHAT =================
+              Align(
+  alignment: Alignment.centerRight,
+  child: TextButton(
+    onPressed: () {
+      setState(() {
+        showSuggestions = !showSuggestions;
+      });
+    },
+    child: Text(
+      showSuggestions ? "Hide suggestions" : "Show suggestions",
+      style: const TextStyle(fontSize: 12),
+    ),
+  ),
+),
               // ================= QUICK SUGGESTIONS =================
               AnimatedCrossFade(
   duration: const Duration(milliseconds: 200),
@@ -341,22 +413,6 @@ Widget buildMessage(Map<String, dynamic> msg) {
   ),
 
   secondChild: const SizedBox.shrink(),
-),
-
-              // ================= CHAT =================
-              Align(
-  alignment: Alignment.centerRight,
-  child: TextButton(
-    onPressed: () {
-      setState(() {
-        showSuggestions = !showSuggestions;
-      });
-    },
-    child: Text(
-      showSuggestions ? "Hide suggestions" : "Show suggestions",
-      style: const TextStyle(fontSize: 12),
-    ),
-  ),
 ),
               Expanded(
                 child: Container(
