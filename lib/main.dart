@@ -263,7 +263,11 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isSmall = size.width < 800;
+
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         centerTitle: true,
         elevation: 0,
@@ -271,6 +275,7 @@ class _ChatPageState extends State<ChatPage> {
         foregroundColor: Colors.white,
         title: const Text("T&T Safety Assistant"),
       ),
+
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -279,24 +284,27 @@ class _ChatPageState extends State<ChatPage> {
             colors: [Color(0xFFF5FBF5), Color(0xFFE4F4E7)],
           ),
         ),
+
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1200),
+
             child: Card(
-              margin: const EdgeInsets.all(20),
+              margin: const EdgeInsets.all(16),
               elevation: 10,
               shadowColor: Colors.black26,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
               ),
+
               child: Column(
                 children: [
-                  // HEADER
+                  // ================= HEADER =================
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 25,
+                      horizontal: 20,
+                      vertical: 16,
                     ),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -311,38 +319,39 @@ class _ChatPageState extends State<ChatPage> {
                       children: [
                         Image.asset(
                           "assets/logo.png",
-                          width: 340,
-                          height: 80,
+                          height: isSmall ? 50 : 80,
                           fit: BoxFit.contain,
                         ),
 
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 10),
 
-                        const Text(
+                        Text(
                           "T&T Industrial Safety Assistant",
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 30,
+                            fontSize: isSmall ? 20 : 28,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
 
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 6),
 
                         Text(
-                          "Powered by AI using the Official T&T Industrial HSE Manual",
+                          "Powered by AI using the Official HSE Manual",
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(.9),
-                            fontSize: 16,
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: isSmall ? 12 : 15,
                           ),
                         ),
 
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 12),
 
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 8,
+                            horizontal: 12,
+                            vertical: 6,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -356,7 +365,7 @@ class _ChatPageState extends State<ChatPage> {
                                 color: Colors.green,
                                 size: 18,
                               ),
-                              SizedBox(width: 8),
+                              SizedBox(width: 6),
                               Text(
                                 "Official HSE Manual",
                                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -368,9 +377,9 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
 
-                  // QUICK QUESTIONS
+                  // ================= QUICK BUTTONS =================
                   Container(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(10),
                     color: Colors.grey.shade50,
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
@@ -387,11 +396,11 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
 
-                  // CHAT
+                  // ================= CHAT AREA =================
                   Expanded(
                     child: ListView.builder(
                       controller: scrollController,
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(16),
                       itemCount: messages.length,
                       itemBuilder: (context, index) {
                         return buildMessage(messages[index]);
@@ -399,16 +408,17 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
 
+                  // ================= LOADING =================
                   if (loading)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
+                    const Padding(
+                      padding: EdgeInsets.symmetric(
                         horizontal: 20,
-                        vertical: 12,
+                        vertical: 10,
                       ),
                       child: Column(
-                        children: const [
+                        children: [
                           LinearProgressIndicator(),
-                          SizedBox(height: 8),
+                          SizedBox(height: 6),
                           Text(
                             "Searching the official HSE Manual...",
                             style: TextStyle(color: Colors.grey),
@@ -417,9 +427,9 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
 
-                  // INPUT BAR
+                  // ================= INPUT BAR =================
                   Container(
-                    padding: const EdgeInsets.all(18),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       border: Border(
@@ -444,25 +454,25 @@ class _ChatPageState extends State<ChatPage> {
                             ),
                           ),
                         ),
+                        const SizedBox(width: 10),
 
-                        const SizedBox(width: 12),
-
-                        FloatingActionButton(
-                          heroTag: "send",
-                          mini: true,
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
+                        IconButton(
+                          icon: Icon(
+                            Icons.send,
+                            color: loading
+                                ? Colors.grey
+                                : Colors.green.shade700,
+                          ),
                           onPressed: loading ? null : sendQuestion,
-                          child: const Icon(Icons.send),
                         ),
                       ],
                     ),
                   ),
 
-                  // FOOTER
+                  // ================= FOOTER =================
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.green.shade50,
                       borderRadius: const BorderRadius.only(
@@ -470,19 +480,11 @@ class _ChatPageState extends State<ChatPage> {
                         bottomRight: Radius.circular(24),
                       ),
                     ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.info_outline, size: 18, color: Colors.green),
-                        SizedBox(width: 8),
-                        Flexible(
-                          child: Text(
-                            "Powered by the official T&T Industrial HSE Manual. If you are unsure or an emergency exists, stop work immediately and contact your supervisor.",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      ],
+                    child: const Text(
+                      "Powered by the official T&T Industrial HSE Manual. "
+                      "If unsure or in an emergency, stop work and contact your supervisor.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 11),
                     ),
                   ),
                 ],
