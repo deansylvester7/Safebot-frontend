@@ -189,18 +189,35 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  Future<void> openSource(String title, List pages) async {
-    final page = pages.isNotEmpty ? pages.first : 1;
+Future<void> openSource(String title, dynamic pages) async {
+  int page = 1;
 
-    final url = Uri.parse(
-      "https://safebot-backend.onrender.com/manual#page=$page",
-    );
+  try {
+    if (pages is List && pages.isNotEmpty) {
+      final first = pages.first;
 
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
+      if (first is int) {
+        page = first;
+      } else if (first is String) {
+        page = int.tryParse(first.replaceAll(RegExp(r'[^0-9]'), '')) ?? 1;
+      } else if (first is Map && first["page"] != null) {
+        page = int.tryParse(first["page"].toString()) ?? 1;
+      }
+    } else if (pages is int) {
+      page = pages;
+    } else if (pages is String) {
+      page = int.tryParse(pages.replaceAll(RegExp(r'[^0-9]'), '')) ?? 1;
     }
+  } catch (_) {
+    page = 1;
   }
 
+  final url = Uri.parse(
+    "https://safebot-backend.onrender.com/manual#page=$page",
+  );
+
+  await launchUrl(url, mode: LaunchMode.externalApplication);
+}
   Widget quickButton(String text) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
