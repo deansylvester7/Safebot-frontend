@@ -267,229 +267,145 @@ class _ChatPageState extends State<ChatPage> {
     final isSmall = size.width < 800;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: Colors.grey.shade50,
+
       appBar: AppBar(
-        centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.green.shade700,
-        foregroundColor: Colors.white,
-        title: const Text("T&T Safety Assistant"),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        centerTitle: true,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              "assets/logo.png",
+              height: isSmall ? 22 : 26,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              isSmall ? "T&T Safety" : "T&T Safety Assistant",
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
       ),
 
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFF5FBF5), Color(0xFFE4F4E7)],
-          ),
-        ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 900),
 
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1200),
-
-            child: Card(
-              margin: const EdgeInsets.all(16),
-              elevation: 10,
-              shadowColor: Colors.black26,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+          child: Column(
+            children: [
+              // ================= QUICK SUGGESTIONS =================
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border(
+                    bottom: BorderSide(color: Colors.grey.shade200),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: isSmall
+                        ? [
+                            quickButton("PPE"),
+                            quickButton("Ladder"),
+                            quickButton("Electrical"),
+                            quickButton("Fall"),
+                          ]
+                        : [
+                            quickButton("PPE"),
+                            quickButton("Ladder Safety"),
+                            quickButton("Scaffolding"),
+                            quickButton("Electrical"),
+                            quickButton("Excavation"),
+                            quickButton("Fall Protection"),
+                          ],
+                  ),
+                ),
               ),
 
-              child: Column(
-                children: [
-                  // ================= HEADER =================
-                  Container(
-                    width: double.infinity,
+              // ================= CHAT =================
+              Expanded(
+                child: Container(
+                  color: Colors.grey.shade50,
+                  child: ListView.builder(
+                    controller: scrollController,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
+                      horizontal: 16,
+                      vertical: 20,
                     ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.green.shade700, Colors.green.shade500],
-                      ),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(24),
-                        topRight: Radius.circular(24),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          "assets/logo.png",
-                          height: isSmall ? 50 : 80,
-                          fit: BoxFit.contain,
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        Text(
-                          "T&T Industrial Safety Assistant",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: isSmall ? 20 : 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-
-                        const SizedBox(height: 6),
-
-                        Text(
-                          "Powered by AI using the Official HSE Manual",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: isSmall ? 12 : 15,
-                          ),
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.verified,
-                                color: Colors.green,
-                                size: 18,
-                              ),
-                              SizedBox(width: 6),
-                              Text(
-                                "Official HSE Manual",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      return buildMessage(messages[index]);
+                    },
                   ),
-
-                  // ================= QUICK BUTTONS =================
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    color: Colors.grey.shade50,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          quickButton("🦺 PPE"),
-                          quickButton("🪜 Ladder Safety"),
-                          quickButton("🏗 Scaffolding"),
-                          quickButton("⚡ Electrical"),
-                          quickButton("🚧 Excavation"),
-                          quickButton("🪖 Fall Protection"),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // ================= CHAT AREA =================
-                  Expanded(
-                    child: ListView.builder(
-                      controller: scrollController,
-                      padding: const EdgeInsets.all(16),
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) {
-                        return buildMessage(messages[index]);
-                      },
-                    ),
-                  ),
-
-                  // ================= LOADING =================
-                  if (loading)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      child: Column(
-                        children: [
-                          LinearProgressIndicator(),
-                          SizedBox(height: 6),
-                          Text(
-                            "Searching the official HSE Manual...",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                  // ================= INPUT BAR =================
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border(
-                        top: BorderSide(color: Colors.grey.shade300),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: controller,
-                            onSubmitted: (_) => sendQuestion(),
-                            decoration: InputDecoration(
-                              hintText: "Ask a safety question...",
-                              prefixIcon: const Icon(Icons.search),
-                              filled: true,
-                              fillColor: Colors.grey.shade100,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-
-                        IconButton(
-                          icon: Icon(
-                            Icons.send,
-                            color: loading
-                                ? Colors.grey
-                                : Colors.green.shade700,
-                          ),
-                          onPressed: loading ? null : sendQuestion,
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // ================= FOOTER =================
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade50,
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(24),
-                        bottomRight: Radius.circular(24),
-                      ),
-                    ),
-                    child: const Text(
-                      "Powered by the official T&T Industrial HSE Manual. "
-                      "If unsure or in an emergency, stop work and contact your supervisor.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 11),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+
+              // ================= LOADING =================
+              if (loading)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  child: Column(
+                    children: [
+                      LinearProgressIndicator(),
+                      SizedBox(height: 6),
+                      Text(
+                        "Searching safety manual...",
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+
+              // ================= INPUT BAR =================
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border(top: BorderSide(color: Colors.grey.shade200)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: controller,
+                        onSubmitted: (_) => sendQuestion(),
+                        decoration: InputDecoration(
+                          hintText: "Ask a safety question...",
+                          filled: true,
+                          fillColor: Colors.grey.shade100,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+
+                    IconButton(
+                      icon: Icon(
+                        Icons.send,
+                        color: loading ? Colors.grey : Colors.green.shade700,
+                      ),
+                      onPressed: loading ? null : sendQuestion,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
