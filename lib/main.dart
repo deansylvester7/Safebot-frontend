@@ -277,7 +277,12 @@ class _ChatPageState extends State<ChatPage> {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                Image.asset('assets/logo.png', height: 100),
+                Image.asset(
+                  'assets/logo.png',
+                  width: 320,
+                  height: 70,
+                  fit: BoxFit.contain,
+                ),
                 const SizedBox(height: 10),
                 const Text(
                   "Safety Assistant",
