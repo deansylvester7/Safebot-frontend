@@ -15,10 +15,7 @@ class SafetyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'T&T Safety Assistant',
-      theme: ThemeData(
-        colorSchemeSeed: Colors.green,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(colorSchemeSeed: Colors.green, useMaterial3: true),
       home: const ChatPage(),
     );
   }
@@ -37,6 +34,84 @@ class _ChatPageState extends State<ChatPage> {
 
   List<Map<String, dynamic>> messages = [];
   bool loading = false;
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showDisclaimer();
+    });
+  }
+
+  void _showDisclaimer() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Row(
+            children: const [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange),
+              SizedBox(width: 10),
+              Text("Important Notice"),
+            ],
+          ),
+          content: SizedBox(
+            width: 600,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    "This Safety Assistant is provided as a reference tool to help employees locate information from the T&T Industrial Health, Safety, and Environmental (HSE) Manual.",
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    "Responses are generated using artificial intelligence and may be incomplete, inaccurate, or not applicable to every work situation.",
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    "This assistant does not replace official company policies, required safety training, supervisor instructions, job hazard analyses, or professional judgment.",
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    "If any response differs from the official T&T Industrial HSE Manual, site-specific requirements, or instructions from your supervisor, always follow the official manual and your supervisor's direction.",
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    "Do not rely on this assistant as the sole source of safety information when performing work. Users remain responsible for following all company safety procedures and applicable regulations.",
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    "In any emergency or potentially hazardous situation, stop work immediately and follow established emergency procedures.",
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    "By selecting 'I Understand', you acknowledge that you have read and understood this notice.",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Text("I Understand", style: TextStyle(fontSize: 16)),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   // 🔥 controls scrolling behavior
   bool _shouldScroll = false;
@@ -67,11 +142,7 @@ class _ChatPageState extends State<ChatPage> {
     if (question.isEmpty) return;
 
     setState(() {
-      messages.add({
-        "role": "user",
-        "text": question,
-        "sources": [],
-      });
+      messages.add({"role": "user", "text": question, "sources": []});
 
       loading = true;
 
@@ -86,19 +157,13 @@ class _ChatPageState extends State<ChatPage> {
 
     try {
       final history = messages.map((m) {
-        return {
-          "role": m["role"],
-          "content": m["text"],
-        };
+        return {"role": m["role"], "content": m["text"]};
       }).toList();
 
       final response = await http.post(
         Uri.parse("https://safebot-backend.onrender.com/ask"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "question": question,
-          "history": history,
-        }),
+        body: jsonEncode({"question": question, "history": history}),
       );
 
       final data = jsonDecode(response.body);
@@ -116,11 +181,7 @@ class _ChatPageState extends State<ChatPage> {
       // ❌ IMPORTANT: no scroll here anymore
     } catch (e) {
       setState(() {
-        messages.add({
-          "role": "assistant",
-          "text": "Error: $e",
-          "sources": [],
-        });
+        messages.add({"role": "assistant", "text": "Error: $e", "sources": []});
 
         loading = false;
       });
@@ -163,19 +224,13 @@ class _ChatPageState extends State<ChatPage> {
           color: isUser ? Colors.green.shade100 : Colors.white,
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-            )
+            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              message["text"] ?? "",
-              style: const TextStyle(fontSize: 16),
-            ),
+            Text(message["text"] ?? "", style: const TextStyle(fontSize: 16)),
             if (sources.isNotEmpty) ...[
               const SizedBox(height: 16),
               const Divider(),
@@ -193,15 +248,13 @@ class _ChatPageState extends State<ChatPage> {
                     leading: const Icon(Icons.menu_book),
                     title: Text(title),
                     subtitle: Text(
-                      pages.isNotEmpty
-                          ? "Page ${pages.first}"
-                          : "No page info",
+                      pages.isNotEmpty ? "Page ${pages.first}" : "No page info",
                     ),
                     onTap: () => openSource(title, pages),
                   ),
                 );
               }).toList(),
-            ]
+            ],
           ],
         ),
       ),
@@ -228,18 +281,12 @@ class _ChatPageState extends State<ChatPage> {
                 const SizedBox(height: 10),
                 const Text(
                   "Safety Assistant",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 5),
                 const Text(
                   "Powered by the T&T Industrial HSE Manual",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
               ],
             ),
