@@ -230,7 +230,6 @@ Future<void> openSource(String title, dynamic pages) async {
 
 Widget buildMessage(Map<String, dynamic> msg) {
   final isUser = msg["role"] == "user";
-
   final sources = msg["sources"];
 
   return AnimatedOpacity(
@@ -243,12 +242,15 @@ Widget buildMessage(Map<String, dynamic> msg) {
             isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           if (!isUser)
             const CircleAvatar(
               radius: 14,
               backgroundColor: Colors.green,
-              child: Icon(Icons.security, size: 14, color: Colors.white),
+              child: Icon(
+                Icons.security,
+                size: 14,
+                color: Colors.white,
+              ),
             ),
 
           if (!isUser) const SizedBox(width: 8),
@@ -257,14 +259,12 @@ Widget buildMessage(Map<String, dynamic> msg) {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
-                // ================= MESSAGE BUBBLE =================
+                // Message bubble
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isUser
-                        ? Colors.green.shade600
-                        : Colors.white,
+                    color:
+                        isUser ? Colors.green.shade600 : Colors.white,
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
@@ -276,54 +276,70 @@ Widget buildMessage(Map<String, dynamic> msg) {
                   child: Text(
                     msg["text"] ?? "",
                     style: TextStyle(
-                      color: isUser ? Colors.white : Colors.black87,
+                      color:
+                          isUser ? Colors.white : Colors.black87,
                       fontSize: 14,
                     ),
                   ),
                 ),
 
-                // ================= SOURCE CARDS =================
+                // Source cards
                 if (!isUser &&
-                    sources != null &&
                     sources is List &&
                     sources.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Column(
-                      children: sources.map<Widget>((s) {
-                        final pages = (s["pages"] ?? [1]) as List;
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: sources.map<Widget>((source) {
+                        final String title =
+                            (source["title"] ??
+                                    "Safety Manual Section")
+                                .toString();
+
+                        final List pages =
+                            (source["pages"] ?? [1]) as List;
 
                         return GestureDetector(
-                          onTap: () => openSource(
-                            s["title"] ?? "Source",
-                            pages,
-                          ),
+                          onTap: () => openSource(title, pages),
                           child: Container(
-                            margin: const EdgeInsets.only(bottom: 6),
+                            margin:
+                                const EdgeInsets.only(bottom: 6),
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: Colors.green.shade50,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius:
+                                  BorderRadius.circular(10),
                               border: Border.all(
                                 color: Colors.green.shade200,
                               ),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Icon(Icons.description,
-                                    size: 16, color: Colors.green),
-                                SizedBox(width: 8),
+                                const Icon(
+                                  Icons.description,
+                                  color: Colors.green,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    "View Source",
-                                    style: TextStyle(
+                                    title,
+                                    style: const TextStyle(
                                       color: Colors.green,
-                                      fontWeight: FontWeight.w500,
+                                      fontWeight:
+                                          FontWeight.w600,
                                     ),
+                                    overflow:
+                                        TextOverflow.ellipsis,
                                   ),
                                 ),
-                                Icon(Icons.open_in_new,
-                                    size: 14, color: Colors.green),
+                                const Icon(
+                                  Icons.open_in_new,
+                                  color: Colors.green,
+                                  size: 14,
+                                ),
                               ],
                             ),
                           ),
@@ -341,7 +357,11 @@ Widget buildMessage(Map<String, dynamic> msg) {
             const CircleAvatar(
               radius: 14,
               backgroundColor: Colors.grey,
-              child: Icon(Icons.person, size: 14, color: Colors.white),
+              child: Icon(
+                Icons.person,
+                size: 14,
+                color: Colors.white,
+              ),
             ),
         ],
       ),
