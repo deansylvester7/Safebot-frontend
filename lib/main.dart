@@ -34,6 +34,7 @@ class _ChatPageState extends State<ChatPage> {
 
   List<Map<String, dynamic>> messages = [];
   bool loading = false;
+  bool showSuggestions = true;
   @override
   void initState() {
     super.initState();
@@ -210,57 +211,69 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget buildMessage(Map<String, dynamic> message) {
-    final isUser = message["role"] == "user";
-    final List sources = message["sources"] ?? [];
+Widget buildMessage(Map<String, dynamic> msg) {
+  final isUser = msg["role"] == "user";
 
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 700),
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: isUser ? Colors.green.shade100 : Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4),
-          ],
-        ),
-        child: Column(
+  return AnimatedOpacity(
+    duration: const Duration(milliseconds: 250),
+    opacity: 1.0,
+    child: AnimatedSlide(
+      duration: const Duration(milliseconds: 250),
+      offset: const Offset(0, 0),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          mainAxisAlignment:
+              isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(message["text"] ?? "", style: const TextStyle(fontSize: 16)),
-            if (sources.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              const Divider(),
-              const Text(
-                "Sources",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              ...sources.map((source) {
-                final title = source["title"] ?? "Unknown";
-                final pages = source["pages"] ?? [];
 
-                return Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.menu_book),
-                    title: Text(title),
-                    subtitle: Text(
-                      pages.isNotEmpty ? "Page ${pages.first}" : "No page info",
+            if (!isUser)
+              const CircleAvatar(
+                radius: 14,
+                backgroundColor: Colors.green,
+                child: Icon(Icons.security, size: 14, color: Colors.white),
+              ),
+
+            if (!isUser) const SizedBox(width: 8),
+
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isUser ? Colors.green.shade600 : Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 6,
                     ),
-                    onTap: () => openSource(title, pages),
+                  ],
+                ),
+                child: Text(
+                  msg["text"] ?? "",
+                  style: TextStyle(
+                    color: isUser ? Colors.white : Colors.black87,
+                    fontSize: 14,
                   ),
-                );
-              }).toList(),
-            ],
+                ),
+              ),
+            ),
+
+            if (isUser) const SizedBox(width: 8),
+
+            if (isUser)
+              const CircleAvatar(
+                radius: 14,
+                backgroundColor: Colors.grey,
+                child: Icon(Icons.person, size: 14, color: Colors.white),
+              ),
           ],
         ),
       ),
-    );
-  }
-
+    ),
+  );
+}
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -298,40 +311,53 @@ class _ChatPageState extends State<ChatPage> {
           child: Column(
             children: [
               // ================= QUICK SUGGESTIONS =================
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border(
-                    bottom: BorderSide(color: Colors.grey.shade200),
-                  ),
-                ),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: isSmall
-                        ? [
-                            quickButton("PPE"),
-                            quickButton("Ladder"),
-                            quickButton("Electrical"),
-                            quickButton("Fall"),
-                          ]
-                        : [
-                            quickButton("PPE"),
-                            quickButton("Ladder Safety"),
-                            quickButton("Scaffolding"),
-                            quickButton("Electrical"),
-                            quickButton("Excavation"),
-                            quickButton("Fall Protection"),
-                          ],
-                  ),
-                ),
-              ),
+              AnimatedCrossFade(
+  duration: const Duration(milliseconds: 200),
+  crossFadeState: showSuggestions
+      ? CrossFadeState.showFirst
+      : CrossFadeState.showSecond,
+
+  firstChild: Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border(
+        bottom: BorderSide(color: Colors.grey.shade200),
+      ),
+    ),
+    child: SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          quickButton("PPE"),
+          quickButton("Ladder Safety"),
+          quickButton("Scaffolding"),
+          quickButton("Electrical"),
+          quickButton("Excavation"),
+          quickButton("Fall Protection"),
+        ],
+      ),
+    ),
+  ),
+
+  secondChild: const SizedBox.shrink(),
+),
 
               // ================= CHAT =================
+              Align(
+  alignment: Alignment.centerRight,
+  child: TextButton(
+    onPressed: () {
+      setState(() {
+        showSuggestions = !showSuggestions;
+      });
+    },
+    child: Text(
+      showSuggestions ? "Hide suggestions" : "Show suggestions",
+      style: const TextStyle(fontSize: 12),
+    ),
+  ),
+),
               Expanded(
                 child: Container(
                   color: Colors.grey.shade50,
