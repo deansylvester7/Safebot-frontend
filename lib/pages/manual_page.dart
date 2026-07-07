@@ -1,47 +1,39 @@
+import 'dart:html' as html;
+import 'dart:ui_web' as ui_web;
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
-
-class ManualPage extends StatefulWidget {
+class ManualPage extends StatelessWidget {
   const ManualPage({super.key});
-
-  @override
-  State<ManualPage> createState() => _ManualPageState();
-}
-
-
-class _ManualPageState extends State<ManualPage> {
-
-  late final WebViewController controller;
-
-
-  @override
-  void initState() {
-    super.initState();
-
-    controller = WebViewController()
-      ..setJavaScriptMode(
-        JavaScriptMode.unrestricted,
-      )
-      ..loadRequest(
-        Uri.parse(
-          "https://safebot-backend.onrender.com/manual",
-        ),
-      );
-  }
-
 
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
+    const String pdfUrl =
+        "https://safebot-backend.onrender.com/manual";
 
+    final String viewId = "manual-pdf-viewer";
+
+    ui_web.platformViewRegistry.registerViewFactory(
+      viewId,
+      (int viewId) {
+        final iframe = html.IFrameElement()
+          ..src = pdfUrl
+          ..style.border = 'none'
+          ..style.width = '100%'
+          ..style.height = '100%';
+
+        return iframe;
+      },
+    );
+
+
+    return Scaffold(
       appBar: AppBar(
         title: const Text("HSE Manual"),
       ),
 
-      body: WebViewWidget(
-        controller: controller,
+      body: HtmlElementView(
+        viewType: viewId,
       ),
     );
   }
