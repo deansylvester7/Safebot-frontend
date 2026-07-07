@@ -553,50 +553,93 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final isMobile = width < 800;
+
+
     return Scaffold(
-      body: Row(
-        children: [
 
-          NavigationRail(
-            extended: true,
+      body: isMobile
+          ? pages[selectedPage]
 
-            selectedIndex: selectedPage,
+          : Row(
+              children: [
 
-            onDestinationSelected: (index) {
-              setState(() {
-                selectedPage = index;
-              });
-            },
+                NavigationRail(
+                  extended: true,
 
-            destinations: const [
+                  selectedIndex: selectedPage,
 
-              NavigationRailDestination(
-                icon: Icon(Icons.smart_toy),
-                label: Text("Assistant"),
-              ),
+                  onDestinationSelected: (index) {
+                    setState(() {
+                      selectedPage = index;
+                    });
+                  },
 
-              NavigationRailDestination(
-                icon: Icon(Icons.play_circle_fill),
-                label: Text("Training"),
-              ),
+                  destinations: const [
 
-              NavigationRailDestination(
-                icon: Icon(Icons.menu_book),
-                label: Text("Manual"),
-              ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.smart_toy),
+                      label: Text("Assistant"),
+                    ),
 
-            ],
-          ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.play_circle_fill),
+                      label: Text("Training"),
+                    ),
 
-          const VerticalDivider(
-            width: 1,
-          ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.menu_book),
+                      label: Text("Manual"),
+                    ),
 
-          Expanded(
-            child: pages[selectedPage],
-          ),
-        ],
-      ),
+                  ],
+                ),
+
+                const VerticalDivider(
+                  width: 1,
+                ),
+
+                Expanded(
+                  child: pages[selectedPage],
+                ),
+              ],
+            ),
+
+
+      bottomNavigationBar: isMobile
+
+          ? NavigationBar(
+
+              selectedIndex: selectedPage,
+
+              onDestinationSelected: (index) {
+                setState(() {
+                  selectedPage = index;
+                });
+              },
+
+              destinations: const [
+
+                NavigationDestination(
+                  icon: Icon(Icons.smart_toy),
+                  label: "Assistant",
+                ),
+
+                NavigationDestination(
+                  icon: Icon(Icons.play_circle_fill),
+                  label: "Training",
+                ),
+
+                NavigationDestination(
+                  icon: Icon(Icons.menu_book),
+                  label: "Manual",
+                ),
+
+              ],
+            )
+
+          : null,
     );
   }
 }
