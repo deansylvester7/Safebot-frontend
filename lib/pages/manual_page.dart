@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pdfx/pdfx.dart';
-import 'package:http/http.dart' as http;
+import 'package:webview_flutter/webview_flutter.dart';
 
 
 class ManualPage extends StatefulWidget {
@@ -13,35 +12,22 @@ class ManualPage extends StatefulWidget {
 
 class _ManualPageState extends State<ManualPage> {
 
-  PdfControllerPinch? pdfController;
+  late final WebViewController controller;
 
 
   @override
   void initState() {
     super.initState();
-    loadPdf();
-  }
 
-
-  Future<void> loadPdf() async {
-
-    final response = await http.get(
-      Uri.parse(
-        "https://safebot-backend.onrender.com/manual",
-      ),
-    );
-
-
-    final document = await PdfDocument.openData(
-      response.bodyBytes,
-    );
-
-
-    setState(() {
-      pdfController = PdfControllerPinch(
-        document: Future.value(document),
+    controller = WebViewController()
+      ..setJavaScriptMode(
+        JavaScriptMode.unrestricted,
+      )
+      ..loadRequest(
+        Uri.parse(
+          "https://safebot-backend.onrender.com/manual",
+        ),
       );
-    });
   }
 
 
@@ -54,16 +40,9 @@ class _ManualPageState extends State<ManualPage> {
         title: const Text("HSE Manual"),
       ),
 
-
-      body: pdfController == null
-
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-
-          : PdfViewPinch(
-              controller: pdfController!,
-            ),
+      body: WebViewWidget(
+        controller: controller,
+      ),
     );
   }
 }
