@@ -540,128 +540,62 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+
 class _HomePageState extends State<HomePage> {
   int selectedPage = 0;
 
+  final pages = const [
+    ChatPage(),
+    TrainingPage(),
+    ManualPage(),
+  ];
+
+
   @override
   Widget build(BuildContext context) {
-    final pages = [
-      const Dashboard(),
-      const ChatPage(),
-      const TrainingPage(),
-      const ManualPage(),
-    ];
-
     return Scaffold(
       body: Row(
         children: [
+
           NavigationRail(
             extended: true,
+
             selectedIndex: selectedPage,
+
             onDestinationSelected: (index) {
               setState(() {
                 selectedPage = index;
               });
             },
+
             destinations: const [
-              NavigationRailDestination(
-                icon: Icon(Icons.home),
-                label: Text("Dashboard"),
-              ),
+
               NavigationRailDestination(
                 icon: Icon(Icons.smart_toy),
                 label: Text("Assistant"),
               ),
+
               NavigationRailDestination(
                 icon: Icon(Icons.play_circle_fill),
                 label: Text("Training"),
               ),
+
               NavigationRailDestination(
                 icon: Icon(Icons.menu_book),
                 label: Text("Manual"),
               ),
+
             ],
           ),
-          const VerticalDivider(width: 1),
+
+          const VerticalDivider(
+            width: 1,
+          ),
+
           Expanded(
             child: pages[selectedPage],
           ),
         ],
-      ),
-    );
-  }
-}
-class Dashboard extends StatelessWidget {
-  const Dashboard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Wrap(
-        spacing: 30,
-        runSpacing: 30,
-        children: const [
-
-          DashboardCard(
-            icon: Icons.smart_toy,
-            title: "AI Assistant",
-            subtitle: "Ask safety questions",
-          ),
-
-          DashboardCard(
-            icon: Icons.play_circle_fill,
-            title: "Training Videos",
-            subtitle: "Watch training",
-          ),
-
-          DashboardCard(
-            icon: Icons.menu_book,
-            title: "HSE Manual",
-            subtitle: "Browse the manual",
-          ),
-        ],
-      ),
-    );
-  }
-}
-class DashboardCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  const DashboardCard({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 260,
-      height: 180,
-      child: Card(
-        elevation: 6,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 55, color: Colors.green),
-              const SizedBox(height: 15),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(subtitle),
-            ],
-          ),
-        ),
       ),
     );
   }
