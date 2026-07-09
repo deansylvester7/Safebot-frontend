@@ -1,4 +1,3 @@
-// Only works on Flutter Web
 import 'dart:html' as html;
 import 'dart:ui_web' as ui;
 import 'package:flutter/material.dart';
@@ -6,12 +5,13 @@ import 'package:flutter/material.dart';
 class ManualPage extends StatelessWidget {
   const ManualPage({super.key});
 
+  static bool _registered = false;
+
   @override
   Widget build(BuildContext context) {
-    const String viewType = 'manual-viewer';
+    const viewType = 'manual-viewer';
 
-    // Register the iframe once
-    try {
+    if (!_registered) {
       ui.platformViewRegistry.registerViewFactory(
         viewType,
         (int viewId) {
@@ -24,8 +24,8 @@ class ManualPage extends StatelessWidget {
           return iframe;
         },
       );
-    } catch (_) {
-      // Ignore if already registered
+
+      _registered = true;
     }
 
     return Scaffold(
