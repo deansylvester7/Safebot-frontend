@@ -214,8 +214,7 @@ Future<void> openSource(String title, dynamic pages) async {
   }
 
   final url = Uri.parse(
-    "https://safebot-backend.onrender.com/manual#page=$page",
-  );
+    "https://safebot-backend.onrender.com/manual-viewer#page=$page",  );
 
   await launchUrl(url, mode: LaunchMode.externalApplication);
 }
@@ -299,11 +298,10 @@ Widget buildMessage(Map<String, dynamic> msg) {
                                     "Safety Manual Section")
                                 .toString();
 
-                        final List pages =
-                            (source["pages"] ?? [1]) as List;
+                        final int page = source["page"] ?? 1;
 
                         return GestureDetector(
-                          onTap: () => openSource(title, pages),
+                          onTap: () => openSource(title, [page]),
                           child: Container(
                             margin:
                                 const EdgeInsets.only(bottom: 6),
