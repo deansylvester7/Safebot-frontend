@@ -618,11 +618,6 @@ class _HomePageState extends State<HomePage> {
                 ),
 
                 NavigationDestination(
-                  icon: Icon(Icons.play_circle_fill),
-                  label: "Training",
-                ),
-
-                NavigationDestination(
                   icon: Icon(Icons.menu_book),
                   label: "Manual",
                 ),
