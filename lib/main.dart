@@ -442,8 +442,9 @@ Widget buildMessage(Map<String, dynamic> msg) {
         children: [
           quickButton("PPE"),
           quickButton("Ladder Safety"),
+          quickButton("Confined Spaces"),
           quickButton("Scaffolding"),
-          quickButton("Electrical"),
+          quickButton("Electrical Safety"),
           quickButton("Excavation"),
           quickButton("Fall Protection"),
         ],
