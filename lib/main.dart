@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
-import 'pages/training_page.dart';
 import 'pages/manual_page.dart';
 void main() {
   runApp(const SafetyApp());
@@ -547,7 +546,6 @@ class _HomePageState extends State<HomePage> {
 
   final pages = const [
     ChatPage(),
-    TrainingPage(),
     ManualPage(),
   ];
 
@@ -583,12 +581,6 @@ class _HomePageState extends State<HomePage> {
                       icon: Icon(Icons.smart_toy),
                       label: Text("Assistant"),
                     ),
-
-                    NavigationRailDestination(
-                      icon: Icon(Icons.play_circle_fill),
-                      label: Text("Training"),
-                    ),
-
                     NavigationRailDestination(
                       icon: Icon(Icons.menu_book),
                       label: Text("Manual"),
