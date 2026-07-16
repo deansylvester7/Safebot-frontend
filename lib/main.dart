@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'pages/manual_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 void main() {
   runApp(const SafetyApp());
 }
@@ -37,24 +38,25 @@ class _ChatPageState extends State<ChatPage> {
   bool loading = false;
   bool showSuggestions = true;
   @override
-void initState() {
-  super.initState();
-  _checkDisclaimer();
-}
-Future<void> _checkDisclaimer() async {
-  final prefs = await SharedPreferences.getInstance();
-
-  final hasSeenDisclaimer =
-      prefs.getBool('has_seen_disclaimer') ?? false;
-
-  if (!hasSeenDisclaimer && mounted) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showDisclaimer();
-    });
-
-    await prefs.setBool('has_seen_disclaimer', true);
+  void initState() {
+    super.initState();
+    _checkDisclaimer();
   }
-}
+
+  Future<void> _checkDisclaimer() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final hasSeenDisclaimer = prefs.getBool('has_seen_disclaimer') ?? false;
+
+    if (!hasSeenDisclaimer && mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showDisclaimer();
+      });
+
+      await prefs.setBool('has_seen_disclaimer', true);
+    }
+  }
+
   void _showDisclaimer() {
     showDialog(
       context: context,
@@ -201,34 +203,36 @@ Future<void> _checkDisclaimer() async {
     }
   }
 
-Future<void> openSource(String title, dynamic pages) async {
-  int page = 1;
+  Future<void> openSource(String title, dynamic pages) async {
+    int page = 1;
 
-  try {
-    if (pages is List && pages.isNotEmpty) {
-      final first = pages.first;
+    try {
+      if (pages is List && pages.isNotEmpty) {
+        final first = pages.first;
 
-      if (first is int) {
-        page = first;
-      } else if (first is String) {
-        page = int.tryParse(first.replaceAll(RegExp(r'[^0-9]'), '')) ?? 1;
-      } else if (first is Map && first["page"] != null) {
-        page = int.tryParse(first["page"].toString()) ?? 1;
+        if (first is int) {
+          page = first;
+        } else if (first is String) {
+          page = int.tryParse(first.replaceAll(RegExp(r'[^0-9]'), '')) ?? 1;
+        } else if (first is Map && first["page"] != null) {
+          page = int.tryParse(first["page"].toString()) ?? 1;
+        }
+      } else if (pages is int) {
+        page = pages;
+      } else if (pages is String) {
+        page = int.tryParse(pages.replaceAll(RegExp(r'[^0-9]'), '')) ?? 1;
       }
-    } else if (pages is int) {
-      page = pages;
-    } else if (pages is String) {
-      page = int.tryParse(pages.replaceAll(RegExp(r'[^0-9]'), '')) ?? 1;
+    } catch (_) {
+      page = 1;
     }
-  } catch (_) {
-    page = 1;
+
+    final url = Uri.parse(
+      "https://safebot-backend.onrender.com/manual-viewer#page=$page",
+    );
+
+    await launchUrl(url, mode: LaunchMode.externalApplication);
   }
 
-  final url = Uri.parse(
-    "https://safebot-backend.onrender.com/manual-viewer#page=$page",  );
-
-  await launchUrl(url, mode: LaunchMode.externalApplication);
-}
   Widget quickButton(String text) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
@@ -239,145 +243,153 @@ Future<void> openSource(String title, dynamic pages) async {
     );
   }
 
-Widget buildMessage(Map<String, dynamic> msg) {
-  final isUser = msg["role"] == "user";
-  final sources = msg["sources"];
+  Widget buildMessage(Map<String, dynamic> msg) {
+    final isUser = msg["role"] == "user";
+    final sources = msg["sources"];
 
-  return AnimatedOpacity(
-    duration: const Duration(milliseconds: 250),
-    opacity: 1.0,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (!isUser)
-            const CircleAvatar(
-              radius: 14,
-              backgroundColor: Colors.green,
-              child: Icon(
-                Icons.security,
-                size: 14,
-                color: Colors.white,
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 250),
+      opacity: 1.0,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          mainAxisAlignment: isUser
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (!isUser)
+              const CircleAvatar(
+                radius: 14,
+                backgroundColor: Colors.green,
+                child: Icon(Icons.security, size: 14, color: Colors.white),
               ),
-            ),
 
-          if (!isUser) const SizedBox(width: 8),
+            if (!isUser) const SizedBox(width: 8),
 
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Message bubble
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color:
-                        isUser ? Colors.green.shade600 : Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 6,
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Message bubble
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isUser ? Colors.green.shade600 : Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 6,
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      msg["text"] ?? "",
+                      style: TextStyle(
+                        color: isUser ? Colors.white : Colors.black87,
+                        fontSize: 14,
                       ),
-                    ],
-                  ),
-                  child: Text(
-                    msg["text"] ?? "",
-                    style: TextStyle(
-                      color:
-                          isUser ? Colors.white : Colors.black87,
-                      fontSize: 14,
                     ),
                   ),
-                ),
 
-                // Source cards
-                if (!isUser &&
-                    sources is List &&
-                    sources.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                      children: sources.map<Widget>((source) {
-                        final String title =
-                            (source["title"] ??
-                                    "Safety Manual Section")
-                                .toString();
+                  // Source cards
+                  if (!isUser && sources is List && sources.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: sources.map<Widget>((source) {
+                          final String document =
+                              (source["document"] ?? "HSE Manual").toString();
 
-                        final int page = source["page"] ?? 1;
+                          final String title = (source["title"] ?? "Section")
+                              .toString();
 
-                        return GestureDetector(
-                          onTap: () => openSource(title, [page]),
-                          child: Container(
-                            margin:
-                                const EdgeInsets.only(bottom: 6),
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.green.shade50,
-                              borderRadius:
-                                  BorderRadius.circular(10),
-                              border: Border.all(
-                                color: Colors.green.shade200,
+                          final int page = source["page"] ?? 1;
+
+                          return GestureDetector(
+                            onTap: () => openSource(title, [page]),
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 6),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.green.shade50,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Colors.green.shade200,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.description,
+                                    color: Colors.green,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          document,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey.shade700,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          title,
+                                          style: const TextStyle(
+                                            color: Colors.green,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          "Page $page",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.open_in_new,
+                                    color: Colors.green,
+                                    size: 14,
+                                  ),
+                                ],
                               ),
                             ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.description,
-                                  color: Colors.green,
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    title,
-                                    style: const TextStyle(
-                                      color: Colors.green,
-                                      fontWeight:
-                                          FontWeight.w600,
-                                    ),
-                                    overflow:
-                                        TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                const Icon(
-                                  Icons.open_in_new,
-                                  color: Colors.green,
-                                  size: 14,
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
-              ],
-            ),
-          ),
-
-          if (isUser) const SizedBox(width: 8),
-
-          if (isUser)
-            const CircleAvatar(
-              radius: 14,
-              backgroundColor: Colors.grey,
-              child: Icon(
-                Icons.person,
-                size: 14,
-                color: Colors.white,
+                ],
               ),
             ),
-        ],
+
+            if (isUser) const SizedBox(width: 8),
+
+            if (isUser)
+              const CircleAvatar(
+                radius: 14,
+                backgroundColor: Colors.grey,
+                child: Icon(Icons.person, size: 14, color: Colors.white),
+              ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -416,52 +428,55 @@ Widget buildMessage(Map<String, dynamic> msg) {
             children: [
               // ================= CHAT =================
               Align(
-  alignment: Alignment.centerRight,
-  child: TextButton(
-    onPressed: () {
-      setState(() {
-        showSuggestions = !showSuggestions;
-      });
-    },
-    child: Text(
-      showSuggestions ? "Hide suggestions" : "Show suggestions",
-      style: const TextStyle(fontSize: 12),
-    ),
-  ),
-),
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      showSuggestions = !showSuggestions;
+                    });
+                  },
+                  child: Text(
+                    showSuggestions ? "Hide suggestions" : "Show suggestions",
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              ),
               // ================= QUICK SUGGESTIONS =================
               AnimatedCrossFade(
-  duration: const Duration(milliseconds: 200),
-  crossFadeState: showSuggestions
-      ? CrossFadeState.showFirst
-      : CrossFadeState.showSecond,
+                duration: const Duration(milliseconds: 200),
+                crossFadeState: showSuggestions
+                    ? CrossFadeState.showFirst
+                    : CrossFadeState.showSecond,
 
-  firstChild: Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      border: Border(
-        bottom: BorderSide(color: Colors.grey.shade200),
-      ),
-    ),
-    child: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          quickButton("PPE"),
-          quickButton("Attendance Policy"),
-          quickButton("Confined Spaces"),
-          quickButton("Scaffolding"),
-          quickButton("Electrical Safety"),
-          quickButton("Benefits"),
-          quickButton("Pay Period"),
-        ],
-      ),
-    ),
-  ),
+                firstChild: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey.shade200),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        quickButton("PPE"),
+                        quickButton("Attendance Policy"),
+                        quickButton("Confined Spaces"),
+                        quickButton("Scaffolding"),
+                        quickButton("Electrical Safety"),
+                        quickButton("Benefits"),
+                        quickButton("Pay Period"),
+                      ],
+                    ),
+                  ),
+                ),
 
-  secondChild: const SizedBox.shrink(),
-),
+                secondChild: const SizedBox.shrink(),
+              ),
               Expanded(
                 child: Container(
                   color: Colors.grey.shade50,
@@ -542,6 +557,7 @@ Widget buildMessage(Map<String, dynamic> msg) {
     );
   }
 }
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -549,30 +565,21 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-
 class _HomePageState extends State<HomePage> {
   int selectedPage = 0;
 
-  final pages = const [
-    ChatPage(),
-    ManualPage(),
-  ];
-
+  final pages = const [ChatPage(), ManualPage()];
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final isMobile = width < 800;
 
-
     return Scaffold(
-
       body: isMobile
           ? pages[selectedPage]
-
           : Row(
               children: [
-
                 NavigationRail(
                   extended: true,
 
@@ -585,7 +592,6 @@ class _HomePageState extends State<HomePage> {
                   },
 
                   destinations: const [
-
                     NavigationRailDestination(
                       icon: Icon(Icons.smart_toy),
                       label: Text("Assistant"),
@@ -594,25 +600,17 @@ class _HomePageState extends State<HomePage> {
                       icon: Icon(Icons.menu_book),
                       label: Text("Manual"),
                     ),
-
                   ],
                 ),
 
-                const VerticalDivider(
-                  width: 1,
-                ),
+                const VerticalDivider(width: 1),
 
-                Expanded(
-                  child: pages[selectedPage],
-                ),
+                Expanded(child: pages[selectedPage]),
               ],
             ),
 
-
       bottomNavigationBar: isMobile
-
           ? NavigationBar(
-
               selectedIndex: selectedPage,
 
               onDestinationSelected: (index) {
@@ -622,7 +620,6 @@ class _HomePageState extends State<HomePage> {
               },
 
               destinations: const [
-
                 NavigationDestination(
                   icon: Icon(Icons.smart_toy),
                   label: "Assistant",
@@ -632,10 +629,8 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(Icons.menu_book),
                   label: "Manual",
                 ),
-
               ],
             )
-
           : null,
     );
   }
