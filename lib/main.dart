@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'pages/manual_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   runApp(const SafetyApp());
 }
@@ -36,14 +37,24 @@ class _ChatPageState extends State<ChatPage> {
   bool loading = false;
   bool showSuggestions = true;
   @override
-  void initState() {
-    super.initState();
+void initState() {
+  super.initState();
+  _checkDisclaimer();
+}
+Future<void> _checkDisclaimer() async {
+  final prefs = await SharedPreferences.getInstance();
 
+  final hasSeenDisclaimer =
+      prefs.getBool('has_seen_disclaimer') ?? false;
+
+  if (!hasSeenDisclaimer && mounted) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showDisclaimer();
     });
-  }
 
+    await prefs.setBool('has_seen_disclaimer', true);
+  }
+}
   void _showDisclaimer() {
     showDialog(
       context: context,
