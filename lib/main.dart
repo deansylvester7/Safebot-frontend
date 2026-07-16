@@ -75,7 +75,7 @@ Future<void> _checkDisclaimer() async {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
                   Text(
-                    "This Safety Assistant is provided as a reference tool to help employees locate information from the T&T Industrial Health, Safety, and Environmental (HSE) Manual.",
+                    "This Company Assistant is provided as a reference tool to help employees locate information from the T&T Industrial Health, Safety, and Environmental (HSE) Manual and the Employee Handbook.",
                   ),
                   SizedBox(height: 15),
                   Text(
@@ -449,12 +449,12 @@ Widget buildMessage(Map<String, dynamic> msg) {
       child: Row(
         children: [
           quickButton("PPE"),
-          quickButton("Ladder Safety"),
+          quickButton("Attendance Policy"),
           quickButton("Confined Spaces"),
           quickButton("Scaffolding"),
           quickButton("Electrical Safety"),
-          quickButton("Excavation"),
-          quickButton("Fall Protection"),
+          quickButton("Benefits"),
+          quickButton("Pay Period"),
         ],
       ),
     ),
