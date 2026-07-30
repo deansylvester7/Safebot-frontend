@@ -507,7 +507,7 @@ class _ChatPageState extends State<ChatPage> {
                       LinearProgressIndicator(),
                       SizedBox(height: 6),
                       Text(
-                        "Searching safety manual...",
+                        "Searching company documentation...",
                         style: TextStyle(color: Colors.grey, fontSize: 12),
                       ),
                     ],
