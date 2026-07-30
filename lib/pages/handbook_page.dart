@@ -1,28 +1,34 @@
+import 'dart:html' as html;
+import 'dart:ui_web' as ui;
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class HandbookPage extends StatelessWidget {
   const HandbookPage({super.key});
 
-  Future<void> openHandbook() async {
-    final url = Uri.parse(
-      "https://safebot-backend.onrender.com/handbook-viewer",
-    );
-
-    await launchUrl(url, mode: LaunchMode.externalApplication);
-  }
+  static bool _registered = false;
 
   @override
   Widget build(BuildContext context) {
+    const viewType = 'handbook-viewer';
+
+    if (!_registered) {
+      ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
+        final iframe = html.IFrameElement()
+          ..src = 'https://safebot-backend.onrender.com/handbook-viewer'
+          ..style.border = 'none'
+          ..style.width = '100%'
+          ..style.height = '100%';
+
+        return iframe;
+      });
+
+      _registered = true;
+    }
+
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(title: const Text("Employee Handbook")),
-      body: Center(
-        child: ElevatedButton.icon(
-          icon: const Icon(Icons.menu_book),
-          label: const Text("Open Handbook"),
-          onPressed: openHandbook,
-        ),
-      ),
+      body: const HtmlElementView(viewType: viewType),
     );
   }
 }
