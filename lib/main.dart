@@ -47,6 +47,8 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> _checkDisclaimer() async {
     final prefs = await SharedPreferences.getInstance();
 
+    await prefs.remove('has_seen_disclaimer');
+
     final hasSeenDisclaimer = prefs.getBool('has_seen_disclaimer') ?? false;
 
     if (!hasSeenDisclaimer) {
