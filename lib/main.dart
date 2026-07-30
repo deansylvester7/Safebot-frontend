@@ -203,35 +203,54 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  Future<void> openSource(String title, dynamic pages) async {
-    int page = 1;
+Future<void> openSource(
+  String document,
+  String title,
+  dynamic pages,
+) async {
+  int page = 1;
 
-    try {
-      if (pages is List && pages.isNotEmpty) {
-        final first = pages.first;
+  try {
+    if (pages is List && pages.isNotEmpty) {
+      final first = pages.first;
 
-        if (first is int) {
-          page = first;
-        } else if (first is String) {
-          page = int.tryParse(first.replaceAll(RegExp(r'[^0-9]'), '')) ?? 1;
-        } else if (first is Map && first["page"] != null) {
-          page = int.tryParse(first["page"].toString()) ?? 1;
-        }
-      } else if (pages is int) {
-        page = pages;
-      } else if (pages is String) {
-        page = int.tryParse(pages.replaceAll(RegExp(r'[^0-9]'), '')) ?? 1;
+      if (first is int) {
+        page = first;
+      } else if (first is String) {
+        page = int.tryParse(
+              first.replaceAll(RegExp(r'[^0-9]'), ''),
+            ) ??
+            1;
+      } else if (first is Map && first["page"] != null) {
+        page = int.tryParse(first["page"].toString()) ?? 1;
       }
-    } catch (_) {
-      page = 1;
+    } else if (pages is int) {
+      page = pages;
+    } else if (pages is String) {
+      page = int.tryParse(
+            pages.replaceAll(RegExp(r'[^0-9]'), ''),
+          ) ??
+          1;
     }
-
-    final url = Uri.parse(
-      "https://safebot-backend.onrender.com/manual-viewer#page=$page",
-    );
-
-    await launchUrl(url, mode: LaunchMode.externalApplication);
+  } catch (_) {
+    page = 1;
   }
+
+  String viewer = "manual-viewer";
+
+  if (document == "Employee Handbook") {
+    viewer = "handbook-viewer";
+  }
+
+  final url = Uri.parse(
+    "https://safebot-backend.onrender.com/$viewer#page=$page",
+  );
+
+  await launchUrl(
+    url,
+    mode: LaunchMode.externalApplication,
+  );
+}
 
   Widget quickButton(String text) {
     return Padding(
@@ -279,7 +298,7 @@ class _ChatPageState extends State<ChatPage> {
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 6,
                         ),
                       ],
@@ -292,92 +311,92 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                   ),
+// Source cards
+if (!isUser &&
+    sources is List &&
+    sources.isNotEmpty)
+  Padding(
+    padding: const EdgeInsets.only(top: 8),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: sources.map<Widget>((source) {
+        final String document =
+            (source["document"] ?? "HSE Manual").toString();
 
-                  // Source cards
-                  if (!isUser && sources is List && sources.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: sources.map<Widget>((source) {
-                          final String document =
-                              (source["document"] ?? "HSE Manual").toString();
+        final String title =
+            (source["title"] ?? "Section").toString();
 
-                          final String title = (source["title"] ?? "Section")
-                              .toString();
+        final int page = source["page"] ?? 1;
 
-                          final int page = source["page"] ?? 1;
-
-                          return GestureDetector(
-                            onTap: () => openSource(title, [page]),
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 6),
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.green.shade50,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Colors.green.shade200,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.description,
-                                    color: Colors.green,
-                                    size: 16,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          document,
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.grey.shade700,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          title,
-                                          style: const TextStyle(
-                                            color: Colors.green,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          "Page $page",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey.shade600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const Icon(
-                                    Icons.open_in_new,
-                                    color: Colors.green,
-                                    size: 14,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                ],
+        return GestureDetector(
+          onTap: () => openSource(
+            document,
+            title,
+            [page],
+          ),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.green.shade50,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: Colors.green.shade200,
               ),
             ),
-
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.description,
+                  color: Colors.green,
+                  size: 16,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        document,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade700,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        "Page $page",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.open_in_new,
+                  color: Colors.green,
+                  size: 14,
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    ),
+  ),
             if (isUser) const SizedBox(width: 8),
-
             if (isUser)
               const CircleAvatar(
                 radius: 14,
@@ -387,7 +406,7 @@ class _ChatPageState extends State<ChatPage> {
           ],
         ),
       ),
-    );
+    ])));
   }
 
   @override
