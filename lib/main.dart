@@ -48,7 +48,7 @@ class _ChatPageState extends State<ChatPage> {
     final prefs = await SharedPreferences.getInstance();
 
     final hasSeenDisclaimer = prefs.getBool('has_seen_disclaimer') ?? false;
-
+    print("Disclaimer status: $hasSeenDisclaimer");
     if (!hasSeenDisclaimer) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
