@@ -49,12 +49,12 @@ class _ChatPageState extends State<ChatPage> {
 
     final hasSeenDisclaimer = prefs.getBool('has_seen_disclaimer') ?? false;
 
-    if (!hasSeenDisclaimer && mounted) {
+    if (!hasSeenDisclaimer) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showDisclaimer();
+        if (mounted) {
+          _showDisclaimer();
+        }
       });
-
-      await prefs.setBool('has_seen_disclaimer', true);
     }
   }
 
@@ -113,8 +113,14 @@ class _ChatPageState extends State<ChatPage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
+                onPressed: () async {
+                  final prefs = await SharedPreferences.getInstance();
+
+                  await prefs.setBool('has_seen_disclaimer', true);
+
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
                 },
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12),
