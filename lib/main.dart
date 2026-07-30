@@ -105,14 +105,8 @@ class _ChatPageState extends State<ChatPage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () async {
-                  final prefs = await SharedPreferences.getInstance();
-
-                  await prefs.setBool('has_seen_disclaimer', true);
-
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
+                onPressed: () {
+                  Navigator.of(context).pop();
                 },
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12),
