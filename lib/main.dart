@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'pages/manual_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'pages/handbook_page.dart';
 
+bool disclaimerShownThisSession = false;
 void main() {
   runApp(const SafetyApp());
 }
@@ -41,21 +41,13 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    _checkDisclaimer();
-  }
 
-  Future<void> _checkDisclaimer() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    final hasSeenDisclaimer = prefs.getBool('has_seen_disclaimer') ?? false;
-    print("Disclaimer status: $hasSeenDisclaimer");
-    if (!hasSeenDisclaimer) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _showDisclaimer();
-        }
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!disclaimerShownThisSession) {
+        disclaimerShownThisSession = true;
+        _showDisclaimer();
+      }
+    });
   }
 
   void _showDisclaimer() {
